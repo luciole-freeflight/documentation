@@ -4,6 +4,64 @@
 * Bluetooth classic and BLE supported by ESP-IDF using bluedroid: [docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/bluetooth/index.html). Bluetooth Classic is required for the game controller.
 * NimBLE only supports BLE (vibrators, glasses)
 * Using [Rust ESP-IDF template](https://github.com/esp-rs/esp-idf-template) should offer everything ESP-IDF exposes, with C and Rust mixed
+* [Lilygo LoRa32](https://www.lilygo.cc/products/lora3) supports Bluetooth version 4.2
+
+## Nordic nRF52840
+* [nRF52840](https://www.nordicsemi.com/Products/nRF52840) supports Bluetooth 5.4 (BLE, etc.)
+* For development, we can use the Nordic nrf52840-dongle
+* For Luciole, we want to use te Seeed Xiao nrf52840 
+
+### SoftDevices
+Pre-compiled blobs of proprietary Nordic code. [Description](https://infocenter.nordicsemi.com/topic/ug_gsg_ses/UG/gsg/softdevices.html)
+We need the nRF52840 to perform a Peripheral role in BLE.
+
+### Nordic nrf52840 dongle
+This uses `Open DFU` bootloader. We need `nrfutil` command to be able to flash it.
+
+For instance, for a binary called `blinky`:
+
+* Make sure to update `memory.x` to account for the soft-device reserved flash and ram memory.
+* Compile
+    ```bash
+    cargo build --bin blinky
+    ```
+    This generate an ELF file.
+* Convert the ELF file into a hex file
+    ```bash
+    arm-none-eabi-objcopy -O ihex target/thumbv7em-none-eabi/debug/blinky blinky.hex
+    ```
+* Create a DFU package (SoftDevice s140 7.3 has version number 0x123)
+    ```bash
+    nrfutil pkg generate --hw-version 52 --sd-req 0x123 --application blinky.hex --application-version 0 dfu.zip
+    ```
+* Flash the DFU package
+    ```bash
+    nrfutil dfu usb-serial -pkg dfu.zip -p /dev/ttyACM0 -b 115200
+    ```
+
+### Seed Xiao nrf52840
+This uses the Arduino UF2 bootloader
+
+* Compile
+    ```bash
+    cargo build --bin blinky
+    ```
+    This generate an ELF file.
+* Convert the ELF file into a hex file
+    ```bash
+    arm-none-eabi-objcopy -O ihex target/thumbv7em-none-eabi/debug/blinky blinky.hex
+    ```
+* Convert the hex file to UF2 (to keep the offsets defined in `memory.x` )
+    ```bash
+    uf2conv.py blinky.hex -c -f 0xADA52840 -o blinky.uf2
+    ```
+* Copy UF2 files to Seeed (in bootloader mode)
+    ```bash
+    cp blinky.uf2 /media/jlg/XIAO-SENSE
+    ```
+* Reset the XIAO
+
+#### [S140](https://infocenter.nordicsemi.com/topic/struct_nrf52/struct/s140.html)
 
 ## Rust on ESP
 Following the [Rust on ESP Book](https://esp-rs.github.io/book/introduction.html) using the standard library (ESP-IDF)
@@ -37,3 +95,7 @@ Using [sx127x_lora](https://docs.rs/sx127x_lora/latest/sx127x_lora/) crate.
 Example: [Issue 13](https://github.com/mr-glt/sx127x_lora/issues/13)
 
 Starting to work a bit. See project [lora-test](https://github.com/luciole-freeflight/rust-lora-test)
+
+## BLE
+
+[Adafruit tutorial](https://learn.adafruit.com/introduction-to-bluetooth-low-energy)

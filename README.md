@@ -15,6 +15,20 @@
 Pre-compiled blobs of proprietary Nordic code. [Description](https://infocenter.nordicsemi.com/topic/ug_gsg_ses/UG/gsg/softdevices.html)
 We need the nRF52840 to perform a Peripheral role in BLE.
 
+#### [S140](https://infocenter.nordicsemi.com/topic/struct_nrf52/struct/s140.html)
+
+* Version 7.3.0 Id `0x123`
+* Content of `memory.x`
+    ```
+    MEMORY
+    {
+      /* NOTE 1 K = 1 KiBi = 1024 bytes */
+      /* These values correspond to the NRF52840 with Softdevices S140 7.3.0 */
+      FLASH : ORIGIN = 0x00027000, LENGTH = 868K // Length = 0x100000 - 0x27000
+      RAM : ORIGIN = 0x20020000, LENGTH = 128K
+    }
+    ```
+
 ### Nordic nrf52840 dongle
 This uses `Open DFU` bootloader. We need `nrfutil` command to be able to flash it.
 
@@ -34,6 +48,7 @@ For instance, for a binary called `blinky`:
     ```bash
     nrfutil pkg generate --hw-version 52 --sd-req 0x123 --application blinky.hex --application-version 0 dfu.zip
     ```
+* Put the dongle in DFU mode: press Reset once while plugged
 * Flash the DFU package
     ```bash
     nrfutil dfu usb-serial -pkg dfu.zip -p /dev/ttyACM0 -b 115200
@@ -55,13 +70,13 @@ This uses the Arduino UF2 bootloader
     ```bash
     uf2conv.py blinky.hex -c -f 0xADA52840 -o blinky.uf2
     ```
-* Copy UF2 files to Seeed (in bootloader mode)
+* Put the dongle in DFU mode: quickly press Reset twice while plugged
+* Copy UF2 files to XIAO
     ```bash
     cp blinky.uf2 /media/jlg/XIAO-SENSE
     ```
 * Reset the XIAO
 
-#### [S140](https://infocenter.nordicsemi.com/topic/struct_nrf52/struct/s140.html)
 
 ## Rust on ESP
 Following the [Rust on ESP Book](https://esp-rs.github.io/book/introduction.html) using the standard library (ESP-IDF)

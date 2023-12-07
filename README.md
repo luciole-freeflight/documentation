@@ -1,5 +1,9 @@
 # Documentation
 
+## Rust
+### Embassy RTOS
+[Embassy Book](https://embassy.dev/book/dev/index.html)
+
 ## ESP32
 * Bluetooth classic and BLE supported by ESP-IDF using bluedroid: [docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/bluetooth/index.html). Bluetooth Classic is required for the game controller.
 * NimBLE only supports BLE (vibrators, glasses)
@@ -16,7 +20,7 @@ Pre-compiled blobs of proprietary Nordic code. [Description](https://infocenter.
 We need the nRF52840 to perform a Peripheral role in BLE.
 
 #### [S140](https://infocenter.nordicsemi.com/topic/struct_nrf52/struct/s140.html)
-
+* [Spec](https://infocenter.nordicsemi.com/pdf/S140_SDS_v2.1.pdf)
 * Version 7.3.0 Id `0x123`
 * Content of `memory.x`
     ```
@@ -31,6 +35,7 @@ We need the nRF52840 to perform a Peripheral role in BLE.
 
 ### Nordic nrf52840 dongle
 This uses `Open DFU` bootloader. We need `nrfutil` command to be able to flash it.
+[Nordic Devzone Tutorial](https://devzone.nordicsemi.com/guides/short-range-guides/b/getting-started/posts/nrf52840-dongle-programming-tutorial)
 
 For instance, for a binary called `blinky`:
 
@@ -44,9 +49,13 @@ For instance, for a binary called `blinky`:
     ```bash
     arm-none-eabi-objcopy -O ihex target/thumbv7em-none-eabi/debug/blinky blinky.hex
     ```
-* Create a DFU package (SoftDevice s140 7.3 has version number 0x123)
+* Create a DFU package (SoftDevice s140 7.3 has version number 0x123). This supposes the softdevice already exists on the chip.
     ```bash
     nrfutil pkg generate --hw-version 52 --sd-req 0x123 --application blinky.hex --application-version 0 dfu.zip
+    ```
+* **Alternative** Create a DFU package with the application AND the softdevice
+    ```bash
+    nrfutil pkg generate --hw-version 52 --sd-req 0x00 --sd-id 0x123 --application blinky.hex --application-version 0 --softdevice s140_nrf52_7.3.0_softdevice.hex dfu.zip
     ```
 * Put the dongle in DFU mode: press Reset once while plugged
 * Flash the DFU package

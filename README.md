@@ -64,7 +64,7 @@ For instance, for a binary called `blinky`:
     ```
 
 ### Seed Xiao nrf52840
-This uses the Arduino UF2 bootloader
+This uses the Arduino UF2 bootloader. Install [`uf2conv.py`](https://github.com/microsoft/uf2/tree/master/utils) and `uf2families.json` (NOT the cargo `uf2conv` crate) in your `$PATH`.
 
 * Compile
     ```bash
@@ -84,7 +84,7 @@ This uses the Arduino UF2 bootloader
     ```bash
     cp blinky.uf2 /media/jlg/XIAO-SENSE
     ```
-* Reset the XIAO
+* The XIAO should reset by itself
 
 
 ## Rust on ESP
